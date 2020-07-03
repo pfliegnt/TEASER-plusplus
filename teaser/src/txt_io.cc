@@ -11,6 +11,7 @@
 #include <iostream>
 #include <memory>
 #include <cstring>
+#include <string>
 
 #include "teaser/txt_io.h"
 
@@ -23,87 +24,71 @@ struct double3 {
 };
 
 int teaser::TXTReader::read(const std::string& file_name, teaser::PointCloud& cloud) {
-/*  std::unique_ptr<std::istream> file_stream;
-  std::vector<uint8_t> byte_buffer;
-
-  try {
-    file_stream.reset(new std::ifstream(file_name, std::ios::binary));
-
-    if (!file_stream || file_stream->fail()) {
-      std::cerr << "Failed to open " << file_name << std::endl;
-      return -1;
-    }
-
-    tinyply::PlyFile file;
-    file.parse_header(*file_stream);
-
-    std::shared_ptr<tinyply::PlyData> vertices;
-
-    try {
-      vertices = file.request_properties_from_element("vertex", {"x", "y", "z"});
-    } catch (const std::exception& e) {
-      std::cerr << "tinyply exception: " << e.what() << std::endl;
-      return -1;
-    }
-
-    file.read(*file_stream);
-
-    if (vertices) {
-      std::cout << "\tRead " << vertices->count << " total vertices " << std::endl;
-      if (vertices->t == tinyply::Type::FLOAT32) {
-        std::vector<float3> verts_floats(vertices->count);
-        const size_t numVerticesBytes = vertices->buffer.size_bytes();
-        std::memcpy(verts_floats.data(), vertices->buffer.get(), numVerticesBytes);
-        for (auto& i : verts_floats) {
-          cloud.push_back({i.x, i.y, i.z});
-        }
-      }
-      if (vertices->t == tinyply::Type::FLOAT64) {
-        std::vector<double3> verts_doubles(vertices->count);
-        const size_t numVerticesBytes = vertices->buffer.size_bytes();
-        std::memcpy(verts_doubles.data(), vertices->buffer.get(), numVerticesBytes);
-        for (auto& i : verts_doubles) {
-          cloud.push_back(
-              {static_cast<float>(i.x), static_cast<float>(i.y), static_cast<float>(i.z)});
-        }
-      }
-    }
-
-  } catch (const std::exception& e) {
-    std::cerr << "Caught tinyply exception: " << e.what() << std::endl;
-    return -1;
-  }
-*/
-  return -1;
-}
-
-int teaser::TXTWriter::write(const std::string& file_name, const teaser::PointCloud& cloud,
-                             bool binary_mode) {
-/*  // Open file buffer according to binary mode
-  std::filebuf fb;
-  if (binary_mode) {
-    fb.open(file_name, std::ios::out | std::ios::binary);
-  } else {
-    fb.open(file_name, std::ios::out);
-  }
-
-  // Open output stream
-  std::ostream outstream(&fb);
-  if (outstream.fail()) {
+  auto file_stream = std::make_unique<std::ifstream>();
+  file_stream->open(file_name);
+  if(!file_stream->is_open())
+  {
     std::cerr << "Failed to open " << file_name << std::endl;
     return -1;
   }
 
-  // Use tinyply to write to ply file
-  tinyply::PlyFile ply_file;
-  std::vector<float3> temp_vertices;
-  for (auto& i : cloud) {
-    temp_vertices.push_back({i.x, i.y, i.z});
+  try
+  {
+    // read the file line by line
+    std::string line;
+    while(std::getline(*file_stream, line))
+    {
+      std::istringstream linestream( line );
+      std::array<std::string,3> token;
+      
+      // read  tokens
+      linestream >> token[0] >> token[1] >> token[2];
+      teaser::PointXYZ point = {
+        std::stof(token[0]),
+        std::stof(token[1]),
+        std::stof(token[2])
+      };
+
+      // add the point
+      cloud.push_back(point);
+
+      // just ignore the rest
+    }
   }
-  ply_file.add_properties_to_element(
-      "vertex", {"x", "y", "z"}, tinyply::Type::FLOAT32, temp_vertices.size(),
-      reinterpret_cast<uint8_t*>(temp_vertices.data()), tinyply::Type::INVALID, 0);
-  ply_file.write(outstream, binary_mode);
-*/
-  return -1;
+  catch(const std::exception& e)
+  {
+    std::cerr << "Failed to read: ";
+    std::cerr << e.what() << '\n';
+    return -1;
+  }
+  
+  return 0;
+}
+
+int teaser::TXTWriter::write(const std::string& file_name, const teaser::PointCloud& cloud) 
+{
+  auto fileStream = std::make_unique<std::ofstream>();
+  fileStream->open(file_name);
+  if(!fileStream->is_open())
+  {
+    std::cerr << "Failed to write to " << file_name << std::endl;
+    return -1;
+  }
+  try
+  {
+    for(const auto& pt : cloud)
+    {
+      *fileStream << std::to_string(pt.x) << ' ';
+      *fileStream << std::to_string(pt.y) << ' ';
+      *fileStream << std::to_string(pt.z) << std::endl;
+    }
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << "Failed to write to file: ";
+    std::cerr << e.what() << '\n';
+    return -1;
+  }
+  
+  return 0;
 }

@@ -13,8 +13,12 @@
 namespace teaser {
 
 /**
- * @brief A class for reading TXT files.
- *
+ * @brief A very simple TXT reader
+ * it expects a text file with point coordinates line by line
+ * 3 coordinates, separated by white space required, rest (rgb, intensity) is being ignored
+ * Example:
+ * 1.23 4.56 7.89
+ * 9.87 6.54 3.21
  */
 class TXTReader {
 public:
@@ -30,7 +34,11 @@ public:
 };
 
 /**
- * @brief A class for writing txt files.
+ * @brief A very simple txt writer
+ * writes the point cloud line by line.
+ * Example output:
+ * 1.23 4.56 7.89
+ * 9.87 6.54 3.21
  */
 class TXTWriter {
 public:
@@ -43,10 +51,9 @@ public:
    * @brief Write point cloud to txt files
    * @param file_name
    * @param cloud
-   * @param binary_mode Set to true to write in binary mode
    * @return A status code
    */
-  int write(const std::string& file_name, const PointCloud& cloud, bool binary_mode = false);
+  int write(const std::string& file_name, const PointCloud& cloud);
 };
 
 } // namespace teaser
