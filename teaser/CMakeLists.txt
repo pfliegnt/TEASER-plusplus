@@ -2,7 +2,7 @@ project(teaser_source)
 include(GNUInstallDirs)
 
 # teaser_io library
-add_library(teaser_io SHARED src/ply_io.cc)
+add_library(teaser_io SHARED src/ply_io.cc src/txt_io.cc)
 target_link_libraries(teaser_io PRIVATE tinyply)
 target_include_directories(teaser_io PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>

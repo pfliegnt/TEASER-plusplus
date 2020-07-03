@@ -1,6 +1,6 @@
 /bazel-*
 BROWSE
-/build*
+**/build
 *.bzlc
 .cache
 .classpath
@@ -30,3 +30,4 @@ TAGS
 /cmake-*
 *.m~
 python/*.egg-info/
+
