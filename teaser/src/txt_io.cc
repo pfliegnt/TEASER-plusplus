@@ -74,7 +74,7 @@ int teaser::TXTReader::read(const std::string& file_name, teaser::PointCloud& cl
     return -1;
   }
 */
-  return 0;
+  return -1;
 }
 
 int teaser::TXTWriter::write(const std::string& file_name, const teaser::PointCloud& cloud,
@@ -105,5 +105,5 @@ int teaser::TXTWriter::write(const std::string& file_name, const teaser::PointCl
       reinterpret_cast<uint8_t*>(temp_vertices.data()), tinyply::Type::INVALID, 0);
   ply_file.write(outstream, binary_mode);
 */
-  return 0;
+  return -1;
 }

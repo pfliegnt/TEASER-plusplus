@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "teaser/ply_io.h"
+#include "teaser/txt_io.h"
 
 TEST(IOTest, ImportPLY) {
   teaser::PLYReader reader;
@@ -42,4 +43,11 @@ TEST(IOTest, ImportBigPLY) {
   teaser::PointCloud cloud;
   auto status = reader.read("./data/uw-rgbdv2-01.ply", cloud);
   EXPECT_EQ(status, 0);
+}
+
+TEST(IOTest, ImportTxt) {
+  teaser::TXTReader reader;
+  teaser::PointCloud cloud;
+  auto status = reader.read("./data/tilo.txt", cloud);
+  EXPECT_EQ(status,0);
 }
